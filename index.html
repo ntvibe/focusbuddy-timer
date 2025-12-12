@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FocusBuddy</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="app">
+    <header class="hero">
+      <h1>FocusBuddy</h1>
+      <p>Select a session length to stay on task.</p>
+    </header>
+
+    <section class="controls">
+      <button data-minutes="10">10 min</button>
+      <button data-minutes="20">20 min</button>
+      <button data-minutes="30">30 min</button>
+    </section>
+
+    <section class="timer-display">
+      <p class="label">Remaining time</p>
+      <div id="time">00:00</div>
+      <p id="status" class="status">Choose a session to begin.</p>
+    </section>
+
+    <section class="sessions">
+      <h2>Today's focus sessions</h2>
+      <ul id="session-log" aria-live="polite"></ul>
+    </section>
+  </main>
+
+  <script src="main.js"></script>
+</body>
+</html>
