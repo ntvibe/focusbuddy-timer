@@ -69,6 +69,17 @@ body {
   border-color: rgba(167, 139, 250, 0.7);
 }
 
+.controls button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.controls button.active {
+  border-color: rgba(167, 139, 250, 0.9);
+  box-shadow: 0 14px 36px rgba(167, 139, 250, 0.2);
+  background: linear-gradient(120deg, rgba(167, 139, 250, 0.35), rgba(167, 139, 250, 0.5));
+}
+
 .timer-display {
   background: rgba(255, 255, 255, 0.02);
   border: 1px solid rgba(255, 255, 255, 0.06);

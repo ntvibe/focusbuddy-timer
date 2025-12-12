@@ -5,6 +5,8 @@ const buttons = document.querySelectorAll("[data-minutes]");
 
 let timerId = null;
 let remainingSeconds = 0;
+let endTime = null;
+let activeButton = null;
 
 function formatTime(totalSeconds) {
   const minutes = Math.floor(totalSeconds / 60)
@@ -18,6 +20,14 @@ function clearTimer() {
   if (timerId) {
     clearInterval(timerId);
     timerId = null;
+  }
+
+  endTime = null;
+  document.title = "FocusBuddy";
+
+  if (activeButton) {
+    activeButton.classList.remove("active");
+    activeButton = null;
   }
 }
 
@@ -37,26 +47,35 @@ function addSession(minutes) {
 }
 
 function startTimer(minutes) {
-  clearTimer();
+  endTime = Date.now() + minutes * 60 * 1000;
   remainingSeconds = minutes * 60;
   timeElement.textContent = formatTime(remainingSeconds);
-  statusElement.textContent = "Stay focused!";
+  statusElement.textContent = `${minutes}-minute session in progress. Stay focused!`;
 
   timerId = setInterval(() => {
-    remainingSeconds -= 1;
-    timeElement.textContent = formatTime(Math.max(remainingSeconds, 0));
+    const now = Date.now();
+    remainingSeconds = Math.max(0, Math.round((endTime - now) / 1000));
+    timeElement.textContent = formatTime(remainingSeconds);
+    document.title = `${timeElement.textContent} · FocusBuddy`;
 
     if (remainingSeconds <= 0) {
       clearTimer();
       statusElement.textContent = "Session complete. Great job!";
       addSession(minutes);
     }
-  }, 1000);
+  }, 250);
+
+  document.title = `${formatTime(remainingSeconds)} · FocusBuddy`;
 }
 
 buttons.forEach((button) => {
   button.addEventListener("click", () => {
     const minutes = Number(button.dataset.minutes);
+    clearTimer();
+    activeButton?.classList.remove("active");
+    button.classList.add("active");
+    activeButton = button;
+
     startTimer(minutes);
   });
 });
