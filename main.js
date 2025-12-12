@@ -2,11 +2,89 @@ const timeElement = document.getElementById("time");
 const statusElement = document.getElementById("status");
 const sessionLog = document.getElementById("session-log");
 const buttons = document.querySelectorAll("[data-minutes]");
+const goalProgressElement = document.getElementById("goal-progress");
+const goalInput = document.getElementById("goal-input");
+const goalForm = document.getElementById("goal-form");
 
 let timerId = null;
 let remainingSeconds = 0;
 let endTime = null;
 let activeButton = null;
+let goalState = null;
+
+const DEFAULT_GOAL = 4;
+const STORAGE_KEY = "focusbuddy-daily";
+
+function getTodayDate() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function loadGoalState() {
+  const saved = localStorage.getItem(STORAGE_KEY);
+
+  if (!saved) {
+    return { goal: DEFAULT_GOAL, progress: 0, date: getTodayDate() };
+  }
+
+  try {
+    const parsed = JSON.parse(saved);
+    const today = getTodayDate();
+
+    if (parsed.date === today) {
+      return {
+        goal: Number(parsed.goal) || DEFAULT_GOAL,
+        progress: Number(parsed.progress) || 0,
+        date: today,
+      };
+    }
+
+    return { goal: Number(parsed.goal) || DEFAULT_GOAL, progress: 0, date: today };
+  } catch (error) {
+    console.error("Failed to parse saved state", error);
+    return { goal: DEFAULT_GOAL, progress: 0, date: getTodayDate() };
+  }
+}
+
+function saveGoalState() {
+  const currentDate = getTodayDate();
+  const state = { ...goalState, date: currentDate };
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+function syncGoalDate() {
+  const today = getTodayDate();
+
+  if (goalState.date !== today) {
+    goalState.progress = 0;
+    goalState.date = today;
+  }
+}
+
+function updateGoalProgress() {
+  syncGoalDate();
+
+  if (goalState.progress >= goalState.goal) {
+    goalProgressElement.textContent = "Goal achieved 🎉";
+    goalProgressElement.classList.add("achieved");
+  } else {
+    goalProgressElement.textContent = `${goalState.progress} / ${goalState.goal} sessions today`;
+    goalProgressElement.classList.remove("achieved");
+  }
+
+  saveGoalState();
+}
+
+function setGoal(newGoal) {
+  const parsedGoal = Math.max(1, Math.floor(newGoal) || DEFAULT_GOAL);
+  goalState.goal = parsedGoal;
+  goalInput.value = parsedGoal;
+  updateGoalProgress();
+}
+
+function recordSessionCompletion() {
+  goalState.progress += 1;
+  updateGoalProgress();
+}
 
 function formatTime(totalSeconds) {
   const minutes = Math.floor(totalSeconds / 60)
@@ -62,6 +140,7 @@ function startTimer(minutes) {
       clearTimer();
       statusElement.textContent = "Session complete. Great job!";
       addSession(minutes);
+      recordSessionCompletion();
     }
   }, 250);
 
@@ -79,3 +158,12 @@ buttons.forEach((button) => {
     startTimer(minutes);
   });
 });
+
+goalForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  setGoal(Number(goalInput.value));
+});
+
+goalState = loadGoalState();
+goalInput.value = goalState.goal;
+updateGoalProgress();

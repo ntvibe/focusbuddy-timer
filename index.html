@@ -19,6 +19,18 @@
       <button data-minutes="30">30 min</button>
     </section>
 
+    <section class="daily-goal">
+      <div class="daily-goal__header">
+        <h2>Daily goal</h2>
+        <form id="goal-form" class="goal-form">
+          <label class="visually-hidden" for="goal-input">Daily goal in sessions</label>
+          <input id="goal-input" type="number" min="1" step="1" value="4" aria-label="Daily goal" />
+          <button type="submit">Save goal</button>
+        </form>
+      </div>
+      <p id="goal-progress" aria-live="polite"></p>
+    </section>
+
     <section class="timer-display">
       <p class="label">Remaining time</p>
       <div id="time" aria-live="polite">00:00</div>
